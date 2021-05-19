@@ -22,6 +22,12 @@ export function chooseReviewers(owner: string, config: Config): string[] {
   return chosenReviewers
 }
 
+export function chooseTeamReviewers(config: Config): string[] {
+  const { numberOfReviewers, teamReviewers } = config
+
+  return chooseUsers(teamReviewers, numberOfReviewers)
+}
+
 export function chooseAssignees(owner: string, config: Config): string[] {
   const {
     useAssigneeGroups,

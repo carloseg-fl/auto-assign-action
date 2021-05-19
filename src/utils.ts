@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as yaml from 'js-yaml'
 import { Config } from './handler'
@@ -23,9 +24,9 @@ export function chooseReviewers(owner: string, config: Config): string[] {
 }
 
 export function chooseTeamReviewers(config: Config): string[] {
-  const { numberOfReviewers, teamReviewers } = config
+  const { teamReviewers } = config
 
-  return chooseUsers(teamReviewers, numberOfReviewers)
+  return teamReviewers
 }
 
 export function chooseAssignees(owner: string, config: Config): string[] {
@@ -73,6 +74,10 @@ export function chooseUsers(
   desiredNumber: number,
   filterUser: string = ''
 ): string[] {
+  if (!candidates || candidates.length == 0) {
+    return []
+  }
+
   const filteredCandidates = candidates.filter((reviewer: string): boolean => {
     return reviewer !== filterUser
   })
@@ -126,6 +131,8 @@ export async function fetchConfigurationFile(client: github.GitHub, options) {
   }
 
   const configString = Buffer.from(data.content, 'base64').toString()
+  core.info(`Found the config ${configString}`)
+
   const config = yaml.safeLoad(configString)
 
   return config

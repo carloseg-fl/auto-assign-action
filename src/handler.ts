@@ -32,6 +32,8 @@ export async function handlePullRequest(
     throw new Error('the webhook payload is not exist')
   }
 
+  core.info(`Team reviewers: ${config.teamReviewers}`)
+
   const { title, draft, user, number } = context.payload.pull_request
   const {
     skipKeywords,
@@ -95,6 +97,8 @@ export async function handlePullRequest(
   }
 
   if (addReviewers) {
+    core.info(`Adding reviewers to PR #${number}`)
+
     try {
       const reviewers = utils.chooseReviewers(owner, config)
 

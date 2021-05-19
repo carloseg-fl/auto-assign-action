@@ -14,7 +14,7 @@ jobs:
   add-reviews:
     runs-on: ubuntu-latest
     steps:
-      - uses: kentaro-m/auto-assign-action@v1.1.2
+      - uses: titenkov/auto-assign-action@v1.2.1
         with:
           configuration-path: ".github/some_name_for_configs.yml" # Only needed if you use something other than .github/auto_assign.yml
 ```
@@ -36,6 +36,11 @@ reviewers:
   - reviewerA
   - reviewerB
   - reviewerC
+
+teamReviewers:
+  - org/teamA
+  - org/teamB
+  - org/teamC
 
 # A number of reviewers added to the pull request
 # Set 0 to add all the reviewers (default: 0)

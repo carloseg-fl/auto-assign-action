@@ -12,6 +12,7 @@ export class PullRequest {
   }
 
   async addReviewers(reviewers: string[]): Promise<void> {
+    core.info(`Adding reviewers ${reviewers ? reviewers.join(', ') : []}`)
     const { owner, repo, number: pull_number } = this.context.issue
     const result = await this.client.pulls.createReviewRequest({
       owner,
@@ -19,10 +20,13 @@ export class PullRequest {
       pull_number,
       reviewers,
     })
-    core.debug(JSON.stringify(result))
+    core.info(JSON.stringify(result))
   }
 
   async addTeamReviewers(team_reviewers: string[]): Promise<void> {
+    core.info(
+      `Adding team reviewers ${team_reviewers ? team_reviewers.join(', ') : []}`
+    )
     const { owner, repo, number: pull_number } = this.context.issue
     const result = await this.client.pulls.createReviewRequest({
       owner,
@@ -30,7 +34,7 @@ export class PullRequest {
       pull_number,
       team_reviewers,
     })
-    core.debug(JSON.stringify(result))
+    core.info(JSON.stringify(result))
   }
 
   async addAssignees(assignees: string[]): Promise<void> {
@@ -41,7 +45,7 @@ export class PullRequest {
       issue_number,
       assignees,
     })
-    core.debug(JSON.stringify(result))
+    core.info(JSON.stringify(result))
   }
 
   hasAnyLabel(labels: string[]): boolean {

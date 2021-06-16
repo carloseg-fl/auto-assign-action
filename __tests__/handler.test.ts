@@ -899,7 +899,7 @@ describe('handlePullRequest', () => {
       addReviewers: true,
       numberOfReviewers: 0,
       reviewers: ['reviewer1'],
-      teamReviewers: ['org/team1', 'org/team2'],
+      teamReviewers: ['reviewer2', 'org/team'],
     } as any
 
     const client = new github.GitHub('token')
@@ -910,11 +910,30 @@ describe('handlePullRequest', () => {
       createReviewRequest: jest.fn().mockImplementation(async () => {}),
     } as any
 
+    client.teams = {
+      getByName: jest.fn().mockImplementation(async () => {
+        return {
+          data: { id: 'teamId' },
+        }
+      }),
+      listMembers: jest.fn().mockImplementation(async () => {
+        return {
+          data: [
+            { login: 'team_member_1' },
+            { login: 'team_member_2' },
+            { login: 'team_member_N' },
+          ],
+        }
+      }),
+    } as any
+
     const addAssigneesSpy = jest.spyOn(client.issues, 'addAssignees')
     const createReviewRequestSpy = jest.spyOn(
       client.pulls,
       'createReviewRequest'
     )
+    const getByNameSpy = jest.spyOn(client.teams, 'getByName')
+    const listMembersSpy = jest.spyOn(client.teams, 'listMembers')
 
     await handler.handlePullRequest(client, context, config)
 
@@ -924,10 +943,19 @@ describe('handlePullRequest', () => {
       /reviewer/
     )
     expect(createReviewRequestSpy.mock.calls[1][0].team_reviewers).toHaveLength(
-      2
+      4
     )
     expect(createReviewRequestSpy.mock.calls[1][0].team_reviewers[0]).toMatch(
-      /org\/team/
+      /reviewer/
+    )
+    expect(createReviewRequestSpy.mock.calls[1][0].team_reviewers[1]).toMatch(
+      /team_member_1/
+    )
+    expect(createReviewRequestSpy.mock.calls[1][0].team_reviewers[2]).toMatch(
+      /team_member_2/
+    )
+    expect(createReviewRequestSpy.mock.calls[1][0].team_reviewers[3]).toMatch(
+      /team_member_N/
     )
   })
 })

@@ -32,10 +32,10 @@ export async function chooseTeamReviewers(
 
   for (const reviewer of teamReviewers) {
     // Reviewer is a full team?
-    if (reviewer.indexOf('/')) {
+    if (reviewer.indexOf('/') != -1) {
       // Fetch team members
       const data: string[] = reviewer.split('/')
-      candidates.concat(
+      candidates = candidates.concat(
         await fetchTeamMembers(client, {
           org: data[0],
           team_slug: data[1],

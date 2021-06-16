@@ -23,10 +23,31 @@ export function chooseReviewers(owner: string, config: Config): string[] {
   return chosenReviewers
 }
 
-export function chooseTeamReviewers(config: Config): string[] {
+export async function chooseTeamReviewers(
+  client: github.GitHub,
+  config: Config
+): Promise<string[]> {
   const { teamReviewers } = config
+  let candidates: string[] = []
 
-  return teamReviewers
+  for (const reviewer of teamReviewers) {
+    // Reviewer is a full team?
+    if (reviewer.indexOf('/')) {
+      // Fetch team members
+      const data: string[] = reviewer.split('/')
+      candidates.concat(
+        await fetchTeamMembers(client, {
+          org: data[0],
+          team_slug: data[1],
+        })
+      )
+    } else {
+      // Single user
+      candidates.push(reviewer)
+    }
+  }
+
+  return candidates
 }
 
 export function chooseAssignees(owner: string, config: Config): string[] {
@@ -136,4 +157,28 @@ export async function fetchConfigurationFile(client: github.GitHub, options) {
   const config = yaml.safeLoad(configString)
 
   return config
+}
+
+export async function fetchTeamMembers(client: github.GitHub, options) {
+  let members: string[] = []
+
+  // Fetch team
+  const { org, team_slug } = options
+  const teamResp = await client.teams.getByName({
+    org,
+    team_slug,
+  })
+
+  // Fetch members
+  const membersResp = await client.teams.listMembers({
+    team_id: teamResp.data.id,
+    role: 'member',
+  })
+
+  // Collect login only
+  for (const member of membersResp.data) {
+    members.push(member.login)
+  }
+
+  return members
 }

@@ -56,7 +56,6 @@ function handlePullRequest(client, context, config) {
         if (!context.payload.pull_request) {
             throw new Error('the webhook payload is not exist');
         }
-        core.info(`Team reviewers: ${config.teamReviewers}`);
         const { title, draft, user, number } = context.payload.pull_request;
         const { skipKeywords, useReviewGroups, useAssigneeGroups, reviewGroups, assigneeGroups, addReviewers, addAssignees, filterLabels, } = config;
         if (skipKeywords && utils.includesSkipKeywords(title, skipKeywords)) {
@@ -319,10 +318,10 @@ function chooseTeamReviewers(client, config) {
         let candidates = [];
         for (const reviewer of teamReviewers) {
             // Reviewer is a full team?
-            if (reviewer.indexOf('/')) {
+            if (reviewer.indexOf('/') != -1) {
                 // Fetch team members
                 const data = reviewer.split('/');
-                candidates.concat(yield fetchTeamMembers(client, {
+                candidates = candidates.concat(yield fetchTeamMembers(client, {
                     org: data[0],
                     team_slug: data[1],
                 }));

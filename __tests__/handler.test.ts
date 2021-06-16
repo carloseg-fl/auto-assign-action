@@ -897,9 +897,9 @@ describe('handlePullRequest', () => {
     const config = {
       addAssignees: false,
       addReviewers: true,
-      numberOfReviewers: 0,
+      numberOfReviewers: 2,
       reviewers: ['reviewer1'],
-      teamReviewers: ['reviewer2', 'org/team'],
+      teamReviewers: ['org/team'],
     } as any
 
     const client = new github.GitHub('token')
@@ -943,19 +943,13 @@ describe('handlePullRequest', () => {
       /reviewer/
     )
     expect(createReviewRequestSpy.mock.calls[1][0].team_reviewers).toHaveLength(
-      4
+      2
     )
     expect(createReviewRequestSpy.mock.calls[1][0].team_reviewers[0]).toMatch(
-      /reviewer/
+      /team_member_/
     )
     expect(createReviewRequestSpy.mock.calls[1][0].team_reviewers[1]).toMatch(
-      /team_member_1/
-    )
-    expect(createReviewRequestSpy.mock.calls[1][0].team_reviewers[2]).toMatch(
-      /team_member_2/
-    )
-    expect(createReviewRequestSpy.mock.calls[1][0].team_reviewers[3]).toMatch(
-      /team_member_N/
+      /team_member_/
     )
   })
 })

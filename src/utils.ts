@@ -27,7 +27,7 @@ export async function chooseTeamReviewers(
   client: github.GitHub,
   config: Config
 ): Promise<string[]> {
-  const { teamReviewers } = config
+  const { teamReviewers, numberOfReviewers } = config
   let candidates: string[] = []
 
   for (const reviewer of teamReviewers) {
@@ -47,7 +47,12 @@ export async function chooseTeamReviewers(
     }
   }
 
-  return candidates
+  // all-assign
+  if (numberOfReviewers === 0) {
+    return candidates
+  }
+
+  return _.sampleSize(candidates, numberOfReviewers)
 }
 
 export function chooseAssignees(owner: string, config: Config): string[] {
